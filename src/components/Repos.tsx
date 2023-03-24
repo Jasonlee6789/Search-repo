@@ -22,7 +22,6 @@ export default function Repos({
 				size="large"
 				pagination={{
 					onChange: (page) => {
-						console.log(page)
 						onPageChange(page)
 					},
 					total: total,

@@ -13,28 +13,25 @@ function App(): JSX.Element {
 	})
 
 	const searchForRepos = async (
-		query: string,
+		searchQuery: string,
 		page: number,
 		perPage: number
 	) => {
 		try {
-			// Set isLoading to true when starting to fetch data
 			setIsLoading(true)
 			const result = await fetch(
 				'https://api.github.com/search/repositories' +
-					(query ? `?q=${query}` : "?q=''") +
+					(searchQuery ? `?q=${searchQuery}` : "?q=''") +
 					`&per_page=${perPage}&page=${page}`
 			)
 
 			const repos = (await result.json()) as IResponse
-			console.log(repos.items)
 			setData(repos)
-			setInputValue(query)
+			setInputValue(searchQuery)
 		} catch (error) {
 			console.error(error)
 			alert('Failed to search for repositories')
 		} finally {
-			// Set isLoading to false when data fetching is done
 			setIsLoading(false)
 		}
 	}
@@ -45,16 +42,18 @@ function App(): JSX.Element {
 		event.preventDefault()
 		const form = event.target as HTMLFormElement
 		const input = form.querySelector('#searchText') as HTMLInputElement
-		const query = input.value.trim()
-		if (query === '') {
+		const searchQuery = input.value.trim()
+		if (searchQuery === '') {
 			return
 		}
-		await throttleResponse(query, 1, 30)
+		await throttleResponse(searchQuery, 1, 30)
 		input.value = ''
 	}
+
 	const changePage = (page: number) => {
 		throttleResponse(inputValue, page, 30)
 	}
+
 	return (
 		<div className="App">
 			<h1>Github Repositories Search App</h1>
