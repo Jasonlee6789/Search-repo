@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import './App.css'
-import { IRepos } from './IRepos'
+import { IResponse } from './IRepos'
 import Repos from './components/Repos'
+import throttle from './util/util'
 
 function App(): JSX.Element {
 	const [inputValue, setInputValue] = useState<string>('')
-	const [repos, setRepos] = useState<IRepos[]>([])
+
+	const [data, setData] = useState<IResponse>({ items: [], total_count: 0 })
 
 	const search = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
@@ -17,9 +19,7 @@ function App(): JSX.Element {
 		}
 
 		try {
-			const response = await searchForRepos(query)
-			setRepos(response)
-			setInputValue(query)
+			await throttleResponse(query, 1, 30)
 		} catch (error) {
 			console.error(error)
 			alert('Failed to search for repositories')
@@ -27,23 +27,21 @@ function App(): JSX.Element {
 		input.value = ''
 	}
 
-	const searchForRepos = async (query: String): Promise<IRepos[]> => {
+	const searchForRepos = async (
+		query: string,
+		page: number,
+		perPage: number
+	) => {
 		const result = await fetch(
 			'https://api.github.com/search/repositories' +
-				(query ? `?q=${query}` : "?q=''")
+				(query ? `?q=${query}` : "?q=''") +
+				`&per_page=${perPage}&page=${page}`
 		)
-		const repos = await result.json()
-		console.log(repos.items)
-		return repos.items
+		const repos = (await result.json()) as IResponse
+		setData(repos)
+		setInputValue(query)
 	}
-
-	useEffect(() => {
-		;(async () => {
-			const query = encodeURIComponent(inputValue)
-			const response = await searchForRepos(query)
-			setRepos(response)
-		})()
-	}, [inputValue])
+	const throttleResponse = throttle(searchForRepos, 1000)
 
 	return (
 		<div className="App">
@@ -52,10 +50,19 @@ function App(): JSX.Element {
 				<input id="searchText" type="text" />
 				<button>Search</button>
 			</form>
-			{inputValue && (
-				<p>Result for search Repos keywords : {inputValue}</p>
-			)}
-			<Repos reposList={repos} />
+			<div className="repos-container">
+				{inputValue && (
+					<p>
+						{data?.total_count}Result for search Repos keywords :{' '}
+						{inputValue}
+					</p>
+				)}
+				<Repos
+					reposList={data?.items}
+					total={data?.total_count}
+					onSearchForRepos={searchForRepos}
+				/>
+			</div>
 		</div>
 	)
 }

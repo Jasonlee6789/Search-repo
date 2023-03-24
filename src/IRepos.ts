@@ -1,3 +1,7 @@
+export interface IResponse {
+	items: IRepos[]
+	total_count: number
+}
 export interface IRepos {
 	id: number
 	node_id: string
