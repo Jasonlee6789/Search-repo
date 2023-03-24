@@ -4,27 +4,27 @@ import { StarTwoTone } from '@ant-design/icons'
 
 interface IReposProps {
 	reposList: IRepos[]
-	//isLoading: boolean
+	isLoading: boolean
 	total: number
-	onSearchForRepos: (query: string, page: number, perPage: number) => void
+	onPageChange: (page: number) => void
 }
 export default function Repos({
 	reposList,
 	total,
-	onSearchForRepos,
+	onPageChange,
+	isLoading,
 }: IReposProps) {
 	return (
 		<>
 			<List
 				itemLayout="vertical"
-				//loading={}
+				loading={isLoading}
 				size="large"
 				pagination={{
 					onChange: (page) => {
 						console.log(page)
-						//onSearchForRepos()
+						onPageChange(page)
 					},
-					pageSize: 10,
 					total: total,
 					position: 'top',
 				}}
