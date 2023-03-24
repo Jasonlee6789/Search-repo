@@ -20,7 +20,6 @@ function App(): JSX.Element {
 		try {
 			// Set isLoading to true when starting to fetch data
 			setIsLoading(true)
-
 			const result = await fetch(
 				'https://api.github.com/search/repositories' +
 					(query ? `?q=${query}` : "?q=''") +
@@ -28,6 +27,7 @@ function App(): JSX.Element {
 			)
 
 			const repos = (await result.json()) as IResponse
+			console.log(repos.items)
 			setData(repos)
 			setInputValue(query)
 		} catch (error) {
@@ -59,16 +59,20 @@ function App(): JSX.Element {
 		<div className="App">
 			<h1>Github Repositories Search App</h1>
 			<form className="searchForm" onSubmit={(event) => search(event)}>
-				<input id="searchText" type="text" />
+				<input
+					id="searchText"
+					type="text"
+					placeholder="Input Github repository keywords"
+				/>
 				<button>Search</button>
 			</form>
+			{inputValue && (
+				<p>
+					Search Results: <span>{data?.total_count}</span>{' '}
+					Repositories with keywords : <span>{inputValue}</span>
+				</p>
+			)}
 			<div className="repos-container">
-				{inputValue && (
-					<p>
-						Search Results: {data?.total_count} Repositories with
-						keywords : {inputValue}
-					</p>
-				)}
 				<Repos
 					reposList={data?.items}
 					total={data?.total_count}

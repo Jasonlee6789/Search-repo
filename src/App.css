@@ -22,3 +22,11 @@
     text-align: left;
     margin: 10px 0;
   }
+  p {
+    color: black;
+  }
+  
+  p span {
+    color: blue;
+  }
+  

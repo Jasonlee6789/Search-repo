@@ -1,7 +1,7 @@
 import { IRepos } from '../IRepos'
 import { List } from 'antd'
 import { StarTwoTone } from '@ant-design/icons'
-
+import { DateTime } from 'luxon'
 interface IReposProps {
 	reposList: IRepos[]
 	isLoading: boolean
@@ -36,7 +36,13 @@ export default function Repos({
 							description={'Description: ' + repo.description}
 						/>
 						<p>Repo Owner: {repo.owner.login}</p>
-						<p>Created: {repo.created_at}</p>
+						<p>
+							Created:{' '}
+							{DateTime.fromISO(repo.created_at).toFormat(
+								'yyyy-MM-dd hh:mm:ss a'
+							)}
+						</p>
+						<p>Program Language: {repo.language}</p>
 						<span>
 							{repo.stargazers_count} <StarTwoTone />
 						</span>
